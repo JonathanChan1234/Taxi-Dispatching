@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".activity.Main2Activity">
+    <fragment
+        android:id="@+id/searchFromText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:name="com.google.android.gms.location.places.ui.PlaceAutocompleteFragment"
+        tools:context=".activity.Main2Activity"
+        android:layout_marginBottom="5dp"
+        android:clickable = "true"
+        android:src="@drawable/powered_by_google_light"/>
+
+    <fragment
+        android:id="@+id/searchToText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:name="com.google.android.gms.location.places.ui.PlaceAutocompleteFragment"
+        tools:context=".activity.Main2Activity"
+        android:clickable = "true"
+        android:src="@drawable/powered_by_google_dark"/>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Make a taxi call"
+        android:id="@+id/taxiRequestButton"/>
+
+    <fragment
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/mainMap"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:context=".activity.Main2Activity"/>
+</LinearLayout>

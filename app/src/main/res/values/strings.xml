@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">Taxi Dispatching</string>
+
+    // Components' text in activity_log_in.xml
+    <string name="createAccountButton">Create Account</string>
+    <string name="signInButton">Sign In</string>
+    <string name="titleText">Taxi\nDispatching</string>
+    <string name="imageText">taxilogo</string>
+
+    //Create Account Page
+    <string name="hintText">This name will be used in communicating with the taxi drive</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="passwordHint">This password will be used in verification</string>
+    <string name="phoneNumber">Phone Number</string>
+    <string name="smsButtonText">Send SMS</string>
+    <string name="verificationText">Verification</string>
+    <string name="smsHint">6 digits</string>
+    <string name="registerButton">Register</string>
+    <string name="title_activity_maps">Map</string>
+</resources>

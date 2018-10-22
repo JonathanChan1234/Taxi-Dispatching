@@ -1,4 +1,4 @@
-package com.jonathan.taxidispatching.constants;
+package com.jonathan.taxidispatching.Utility;
 
 import com.google.android.gms.maps.model.LatLng;
 

@@ -15,7 +15,6 @@
         android:layout_marginBottom="5dp"
         android:clickable = "true"
         android:src="@drawable/powered_by_google_light"/>
-
     <fragment
         android:id="@+id/searchToText"
         android:layout_width="match_parent"

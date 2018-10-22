@@ -22,7 +22,6 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
-import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
 
 
 import com.jonathan.taxidispatching.AppController.AppController;
@@ -31,7 +30,7 @@ import com.jonathan.taxidispatching.R;
 import com.jonathan.taxidispatching.Utility.ErrorMessageUtility;
 import com.jonathan.taxidispatching.Utility.MapLayout;
 import com.jonathan.taxidispatching.constants.Constants;
-import com.jonathan.taxidispatching.constants.JSONDirectionParser;
+import com.jonathan.taxidispatching.Utility.JSONDirectionParser;
 
 import org.json.JSONException;
 import org.json.JSONObject;

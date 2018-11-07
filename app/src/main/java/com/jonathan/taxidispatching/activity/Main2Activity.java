@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.app.TimePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -12,11 +13,19 @@ import android.graphics.Color;
 import android.location.Location;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 
@@ -58,12 +67,16 @@ import com.jonathan.taxidispatching.Utility.JSONDirectionParser;
 
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -88,6 +101,16 @@ public class Main2Activity extends AppCompatActivity implements
     PlaceAutocompleteFragment fromSearchFragment, toSearchFragment; //Search Fragment
     @BindView(R.id.taxiRequestButton)
     Button requestButton;
+    @BindView(R.id.timePickView)
+    LinearLayout timePickerView;
+    @BindView(R.id.timePicker)
+    TextView timePickerText;
+    @BindView(R.id.clearButton)
+    Button clearButton;
+
+    private DrawerLayout mDrawerLayout;
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
 
     //Constant
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
@@ -113,8 +136,8 @@ public class Main2Activity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ///hide the title bar and set the content view
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
-        getSupportActionBar().hide();
+//        requestWindowFeature(Window.FEATURE_NO_TITLE);
+//        getSupportActionBar().hide();
         setContentView(R.layout.activity_main2);
         googleApiInterface = GoogleMapAPIClient.getClient().create(GoogleMapAPIInterface.class);
         apiInterface = APIClient.getClient().create(APIInterface.class);
@@ -124,6 +147,7 @@ public class Main2Activity extends AppCompatActivity implements
 
         initSearchFragment();
         initMapLoadingDialog();
+        initDrawerLayout();
 
         client = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
@@ -190,6 +214,30 @@ public class Main2Activity extends AppCompatActivity implements
         mapFragment.getMapAsync(this);
     }
 
+    private void initDrawerLayout() {
+        mDrawerLayout = findViewById(R.id.drawer_layout);
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+                return true;
+            }
+        });
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setHomeAsUpIndicator(R.drawable.ic_menu_black_24dp);
+        setSupportActionBar(toolbar);
+    }
+
+    public boolean onOptionsItemSelected(MenuItem menuItem) {
+        switch (menuItem.getItemId()) {
+            case android.R.id.home:
+                mDrawerLayout.openDrawer(GravityCompat.START);
+                return true;
+        }
+        return super.onOptionsItemSelected(menuItem);
+    }
+
     /**
      * Initialize the map loading progress dialog
      */
@@ -205,10 +253,29 @@ public class Main2Activity extends AppCompatActivity implements
         mMap = googleMap;
         enableMyLocation();
         LatLng latlng = new LatLng(22.306398, 114.163554);
-//        googleMap.addMarker(new MarkerOptions().position(latlng).title("Current position"));
         googleMap.moveCamera(CameraUpdateFactory.newLatLng(latlng));
         googleMap.moveCamera(CameraUpdateFactory.zoomTo(14));
         mMap.setOnMapClickListener(clickSetMarker);
+    }
+
+    @OnClick(R.id.timePickView)
+    public void pickMeetUpTime(View v) {
+        Calendar c = Calendar.getInstance();
+        int minute = c.get(Calendar.MINUTE);
+        int hour = c.get(Calendar.HOUR_OF_DAY);
+        new TimePickerDialog(this, new TimePickerDialog.OnTimeSetListener(){
+            @Override
+            public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                timePickerText.setText(hourOfDay + ":" + minute);
+                timePickerText.setTextSize(18);
+            }
+        }, hour, minute, false).show();
+    }
+
+    @OnClick(R.id.clearButton)
+    public void clearTime(View v) {
+        timePickerText.setText("");
+        timePickerText.setTextSize(10);
     }
 
     /**
@@ -247,7 +314,6 @@ public class Main2Activity extends AppCompatActivity implements
         } else {
             Toast.makeText(this, "You have to select both the pick-up point \nand destination", Toast.LENGTH_SHORT).show();
         }
-
     }
 
     /**
@@ -258,14 +324,14 @@ public class Main2Activity extends AppCompatActivity implements
     private void confirmationDialogPopUp(JSONObject details) {
         final Dialog dialog = new Dialog(Main2Activity.this);
         dialog.setContentView(R.layout.custom_bill_dialog);
-
         Button confirmationButton = dialog.findViewById(R.id.confirmationButton);
         TextView detailsText = dialog.findViewById(R.id.billDetailText);
         try {
             String text = "Estimated Distance: " + details.getString("distance") + "\n"
                     + "Estimated Travel Time: " + details.getString("duration") + " minutes";
+            if(TextUtils.isEmpty(timePickerText.getText().toString()))text += "\n Meet up time: now";
+            else text += "\n Meet up time: " + timePickerText.getText().toString();
             detailsText.setText(text);
-
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -274,9 +340,9 @@ public class Main2Activity extends AppCompatActivity implements
             public void onClick(View view) {
                 EditText requirementText = dialog.findViewById(R.id.requirementText);
                 String text = requirementText.getText().toString();
-//                Calendar calendar = dialog.findViewById(R.id.timePicker).
+                String meet_up_time = timePickerText.getText().toString();
                 Call<Transcation> call = apiInterface.startTranscation(1, marker[0].latitude, marker[0].longitude, address.get("origin"),
-                        marker[1].latitude, marker[1].longitude, address.get("destination"), null, requirement);
+                        marker[1].latitude, marker[1].longitude, address.get("destination"), meet_up_time, text);
                 call.enqueue(new Callback<Transcation>() {
                     @Override
                     public void onResponse(Call<Transcation> call, retrofit2.Response<Transcation> response) {

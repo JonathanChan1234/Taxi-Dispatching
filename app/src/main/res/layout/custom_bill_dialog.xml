@@ -33,17 +33,11 @@
         android:fontFamily="sans-serif"
         android:inputType="text"
         android:hint="List your requirement"/>
-
-    <TimePicker
-        android:id="@+id/timePicker"
-        android:layout_width="wrap_content"
-        android:layout_height="341dp"
-        android:layout_below="@id/requirementText" />
     <Button
         android:id="@+id/confirmationButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:layout_below="@+id/timePicker"
+        android:layout_below="@+id/requirementText"
         android:text="Make Appointment"/>
 </RelativeLayout>

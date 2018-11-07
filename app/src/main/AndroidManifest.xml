@@ -3,14 +3,24 @@
     package="com.jonathan.taxidispatching">
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.CALL_PHONE"/>
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.CALL_PHONE" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <!--
          The ACCESS_COARSE/FINE_LOCATION permissions are not required to use
          Google Maps Android API v2, but you must specify either coarse or fine
          location permissions for the 'MyLocation' functionality. 
     -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
+    <uses-feature
+        android:name="android.hardware.camera.any"
+        android:required="true" />
+    <uses-feature
+        android:name="android.hardware.camera.autofocus"
+        android:required="false" />
 
     <application
         android:name=".AppController.AppController"
@@ -21,8 +31,10 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".activity.Main2Activity"
-            android:label="@string/title_activity_maps">
+            android:name=".activity.LogInActivity"
+            android:label="FYP"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar">
+
             <!-- android:name=".activity.LogInActivity"> -->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -30,9 +42,18 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.CreateAccountActivity" />
-        <activity android:name=".activity.SignInActivity" />
-        <activity android:name=".activity.MainActivity" />
+        <activity
+            android:name=".activity.Main2Activity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+        <activity
+            android:name=".activity.SignInActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+        <activity
+            android:name=".activity.CreateAccountActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+        <activity
+            android:name=".activity.MainActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
 
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
@@ -46,10 +67,7 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyBwJyQDS_1ZZfic_OLFdB0q7UZC11B9vw4" />
 
-         <activity
-         android:name=".activity.MapsActivity"
-         android:label="@string/title_activity_maps"/>
-        <!--<activity android:name=".activity.Main2Activity"/>-->
+        <activity android:name=".activity.DriverMainActivity"></activity>
     </application>
 
 </manifest>

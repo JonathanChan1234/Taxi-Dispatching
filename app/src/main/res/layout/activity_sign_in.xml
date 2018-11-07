@@ -4,80 +4,75 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/backgroundBlue"
     tools:context=".activity.SignInActivity">
-    <TableLayout
+
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <TableRow
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+        <ImageView
+            android:id="@+id/imageView4"
+            android:layout_width="272dp"
+            android:layout_height="140dp"
+            android:contentDescription="@string/imageText"
+            app:srcCompat="@drawable/carlogo" />
+        <RadioGroup
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
-            <ImageView
-                android:id="@+id/imageView4"
-                android:layout_width="272dp"
-                android:layout_height="140dp"
-                android:contentDescription="@string/imageText"
-                app:srcCompat="@drawable/carlogo" />
-        </TableRow>
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginTop="5dp">
-            <TextView
-                android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:orientation="horizontal"
+            android:gravity="center">
+            <RadioButton
+                android:id="@+id/passengerButtonInSignIn"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/phoneNumber"
-                android:textAllCaps="true"
-                android:textColor="@color/black"
-                android:textSize="20sp"
-                android:textStyle="bold" />
-        </TableRow>
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-            <EditText
-                android:id="@+id/phoneTextSignIn"
-                style="@android:style/Widget.Holo.EditText"
-                android:layout_width="match_parent"
+                android:text="@string/passengers_in_register"
+                android:checked="true"
+                android:layout_marginEnd="10dp"/>
+            <RadioButton
+                android:id="@+id/driverButtonInSignIn"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:focusable="true"
-                android:hint=""
-                android:inputType="phone"
-                android:singleLine="false"
-                android:textSize="12sp" />
-        </TableRow>
-        <TableRow
+                android:text="@string/driver_in_register"/>
+        </RadioGroup>
+        <TextView
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginTop="5dp">
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/password"
-                android:textAllCaps="true"
-                android:textColor="@color/black"
-                android:textSize="20sp"
-                android:textStyle="bold" />
-        </TableRow>
-
-        <TableRow
+            android:layout_height="wrap_content"
+            android:text="@string/phoneNumber"
+            android:textAllCaps="true"
+            android:textColor="@color/black"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+        <EditText
+            android:id="@+id/phoneTextSignIn"
+            style="@android:style/Widget.Holo.EditText"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <EditText
-                android:id="@+id/passwordTextSignIn"
-                style="@android:style/Widget.Holo.EditText"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:focusable="true"
-                android:hint="@string/passwordHint"
-                android:inputType="numberPassword"
-                android:singleLine="false"
-                android:textSize="12sp" />
-        </TableRow>
-    </TableLayout>
-
+            android:layout_height="wrap_content"
+            android:focusable="true"
+            android:hint=""
+            android:inputType="phone"
+            android:singleLine="false"
+            android:textSize="12sp" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/password"
+            android:textAllCaps="true"
+            android:textColor="@color/black"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+        <EditText
+            android:id="@+id/passwordTextSignIn"
+            style="@android:style/Widget.Holo.EditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:focusable="true"
+            android:hint="@string/passwordHint"
+            android:inputType="numberPassword"
+            android:singleLine="false"
+            android:textSize="12sp" />
+    </LinearLayout>
     <Button
         android:id="@+id/signInButton"
         android:layout_width="match_parent"

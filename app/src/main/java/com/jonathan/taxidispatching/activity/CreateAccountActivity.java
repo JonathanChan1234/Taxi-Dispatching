@@ -1,9 +1,17 @@
 package com.jonathan.taxidispatching.activity;
 
+import android.Manifest;
+import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
+import android.provider.MediaStore;
+import android.support.annotation.Nullable;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -12,101 +20,299 @@ import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.jonathan.taxidispatching.AppController.AppController;
-import com.jonathan.taxidispatching.AppController.CustomRequest;
+import com.jonathan.taxidispatching.APIClient.APIClient;
+import com.jonathan.taxidispatching.APIInterface.APIInterface;
+import com.jonathan.taxidispatching.APIObject.AccountResponse;
 import com.jonathan.taxidispatching.R;
-import com.jonathan.taxidispatching.Utility.ErrorMessageUtility;
-import com.jonathan.taxidispatching.constants.Constants;
+import com.jonathan.taxidispatching.SharePreference.Session;
+import com.jonathan.taxidispatching.Utility.FileUtils;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.lang.ref.WeakReference;
-import java.util.HashMap;
-import java.util.Map;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+import io.reactivex.SingleObserver;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
+import permissions.dispatcher.NeedsPermission;
+import permissions.dispatcher.RuntimePermissions;
+
+@RuntimePermissions
 public class CreateAccountActivity extends AppCompatActivity {
-    EditText usernameText, passwordText, verificationText, phoneText;
-    Button sendSMSButton, registerButton;
-    TextView counterText;
+    //onActivityResult Parameters
+    public static final int REQUEST_CAMERA = 100;
+    public static final int SELECT_FILE = 101;
+    private static final String TAG = "RxJava";
 
-    String phoneNumber = "";
+    //Initialize the UI components
+    @BindView(R.id.usernameText) EditText usernameText;
+    @BindView(R.id.passwordText) EditText passwordText;
+    @BindView(R.id.verificationCodeText) EditText verificationText;
+    @BindView(R.id.phoneText) EditText phoneText;
+    @BindView(R.id.sendSMSButton) Button sendSMSButton;
+    @BindView(R.id.registerButton) Button registerButton;
+    @BindView(R.id.counterText) TextView counterText;
+    @BindView(R.id.profileImg) ImageView profileImg;
+    @BindView(R.id.emailText) EditText emailText;
+    @BindView(R.id.passengerButtonInRegister) RadioButton passengerButton;
+
+    // Used in verification counter
     Handler counterHandler;
+    //Determine the running of the thread
     boolean flag = false;
+
+    //API Interface
+    APIInterface apiInterface;
+
+    //Method chosen by the user on choosing the profile img
+    String userChosenTask = "";
+    Bitmap thumbnail; //bitmap thumbnail posted on the page
+    String imageFilePath; //imageFile Path to upload to the server
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        getSupportActionBar().hide();
         setContentView(R.layout.activity_create_account);
-        initUI();
+        //Initialize UI Components
+        ButterKnife.bind(this);
+        //Initialize Counting handler
         counterHandler = new CountingHandler(this);
+        //Initialize API Interface
+        apiInterface = APIClient.getClient().create(APIInterface.class);
     }
 
-    private void initUI() {
-        usernameText = findViewById(R.id.usernameText);
-        passwordText = findViewById(R.id.passwordText);
-        phoneText = findViewById(R.id.phoneText);
-        verificationText = findViewById(R.id.verificationCodeText);
-        sendSMSButton = findViewById(R.id.sendSMSButton);
-        counterText = findViewById(R.id.counterText);
-        registerButton = findViewById(R.id.registerButton);
-
-        sendSMSButton.setOnClickListener(sendSMSListener);
-        registerButton.setOnClickListener(registerAccount);
+//    Select Profile Image
+    @OnClick(R.id.profileImg)
+    public void selectImg(View v) {
+        final CharSequence[] items = {"Take Photo", "Choose from Library",
+                "Cancel"};
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Add photo");
+        builder.setItems(items, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                if(items[i].equals("Take Photo")) {
+                    userChosenTask = "Take Photo";
+                    CreateAccountActivityPermissionsDispatcher.cameraIntentWithPermissionCheck(CreateAccountActivity.this);
+                }
+                else if(items[i].equals("Choose from Library")) {
+                    userChosenTask = "Choose from Library";
+                    CreateAccountActivityPermissionsDispatcher.galleryIntentWithPermissionCheck(CreateAccountActivity.this);
+                }
+                else if(items[i].equals("Cancel")){
+                    dialogInterface.dismiss();
+                }
+            }
+        });
+        builder.show();
     }
-    //Send SMS Button Listener
-    View.OnClickListener sendSMSListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View view) {
-            checkEmpty();
+
+    @NeedsPermission({Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE})
+    public void cameraIntent() {
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        startActivityForResult(intent, REQUEST_CAMERA);
+    }
+
+    @NeedsPermission({Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE})
+    public void galleryIntent() {
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(Intent.createChooser(intent, "Select file"), SELECT_FILE);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if(resultCode == Activity.RESULT_OK) {
+            switch(requestCode) {
+                case REQUEST_CAMERA:
+                    onCaptureImageResult(data);
+                    break;
+                case SELECT_FILE:
+                    onSelectFromGalleryResult(data);
+                    break;
+                default:
+                    break;
+            }
         }
-    };
+    }
+
+    @NeedsPermission({Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE})
+    public void onCaptureImageResult(Intent data) {
+        thumbnail = (Bitmap) data.getExtras().get("data");
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        thumbnail.compress(Bitmap.CompressFormat.JPEG, 90, bytes);
+        File tmpDir = new File(Environment.getExternalStorageDirectory() + "/" + "taxi");
+        if (!tmpDir.exists()){
+            tmpDir.mkdir();
+        }
+        File destination = new File(tmpDir.getAbsolutePath(), System.currentTimeMillis() + ".jpg");
+        Log.d("Path", destination.getPath());
+        imageFilePath = destination.getPath();
+        FileOutputStream fo;
+        try {
+            destination.createNewFile();
+            fo = new FileOutputStream(destination);
+            fo.write(bytes.toByteArray());
+            fo.close();
+        }
+        catch(FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        catch(IOException e) {
+            e.printStackTrace();
+        }
+        profileImg.setImageBitmap(thumbnail);
+    }
+
+    @NeedsPermission({Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE})
+    public void onSelectFromGalleryResult(Intent data) {
+        if (data != null) {
+            try {
+                String path = data.getData().getPath();
+                Log.d("Path from gallery", path);
+                Log.d("Absolute Path", FileUtils.getPath(this, data.getData()));
+                imageFilePath = FileUtils.getPath(this, data.getData());
+                thumbnail = MediaStore.Images.Media.getBitmap(CreateAccountActivity.this.getContentResolver(), data.getData());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        profileImg.setImageBitmap(thumbnail);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        // NOTE: delegate the permission handling to generated method
+        CreateAccountActivityPermissionsDispatcher.onRequestPermissionsResult(this, requestCode, grantResults);
+    }
 
     //Check whether all the info is filled
-    private void checkEmpty() {
+    @OnClick(R.id.sendSMSButton)
+    public void checkEmpty(View v) {
         if(TextUtils.isEmpty(usernameText.getText().toString()) ||
                 TextUtils.isEmpty(passwordText.getText().toString()) ||
                 TextUtils.isEmpty(phoneText.getText().toString())) {
             Toast.makeText(CreateAccountActivity.this, "all the info have to be filled", Toast.LENGTH_LONG).show();
         } else {
-            checkAccountValidity();
+//            checkAccountValidity();
+            counterText.setVisibility(View.VISIBLE);
+            registerButton.setVisibility(View.VISIBLE);
         }
     }
 
-    // Check account validity
-    private void checkAccountValidity() {
-        Map<String, String> params = new HashMap<>();
-        params.put("username", usernameText.getText().toString());
-        params.put("password", passwordText.getText().toString());
-        params.put("phonenumber", phoneText.getText().toString());
-        phoneNumber = phoneText.getText().toString();
-        CustomRequest request = new CustomRequest(Request.Method.POST, Constants.verification_api, params, new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                try {
-                    if(response.getInt("success") == 1) {
-                        Toast.makeText(CreateAccountActivity.this, response.getString("message"), Toast.LENGTH_LONG).show();
-                        verificationText.setVisibility(View.VISIBLE);
-                        counterText.setVisibility(View.VISIBLE);
-                        registerButton.setVisibility(View.VISIBLE);
-                        sendSMSButton.setText("Send again");
-                        startCounting();
-                    } else {
-                        Toast.makeText(CreateAccountActivity.this, response.getString("message"), Toast.LENGTH_LONG).show();
-                    }
-                } catch(JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        }, ErrorMessageUtility.getNetworkErrorListener(CreateAccountActivity.this));
-        AppController.getInstance().addToRequestQueue(request, "verification");
+    @OnClick(R.id.registerButton)
+    public void registerAccount (View v) {
+        MultipartBody.Part imageFile = null;
+        if(imageFilePath != null) {
+            File img = new File(imageFilePath);
+            RequestBody requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), img);
+            imageFile = MultipartBody.Part.createFormData("profileImg", img.getName(), requestFile);
+        }
+        RequestBody username = RequestBody.create(MediaType.parse("multipart/form-data"), usernameText.getText().toString());
+        RequestBody password = RequestBody.create(MediaType.parse("multipart/form-data"), passwordText.getText().toString());
+        RequestBody phonenumber = RequestBody.create(MediaType.parse("multipart/form-data"), phoneText.getText().toString());
+        RequestBody email = RequestBody.create(MediaType.parse("multipart/form-data"), emailText.getText().toString());
+        if(passengerButton.isChecked()) {
+            makeRequest("passenger", imageFile, username, password, phonenumber, email);
+        } else {
+            makeRequest("driver", imageFile, username, password, phonenumber, email);
+        }
+    }
+
+    private void makeRequest(String identity, MultipartBody.Part file, RequestBody username, RequestBody password, RequestBody phonenumber, RequestBody email) {
+        if(identity.equals("identity")) {
+            apiInterface.passengerCreateAccount(file, username, password, phonenumber, email)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new SingleObserver<AccountResponse>() {
+                        @Override
+                        public void onSubscribe(Disposable d) {
+                            Log.d(TAG, "onSubscribe: ");
+                        }
+
+                        @Override
+                        public void onSuccess(AccountResponse response) {
+                            if(response.success == 1) {
+                                Toast.makeText(CreateAccountActivity.this, "Account created successfully", Toast.LENGTH_SHORT).show();
+                                Session.logIn(CreateAccountActivity.this, usernameText.getText().toString(), response.access_token);
+                                //store the access code, account username, password, phone number
+                                //go to the main map activity
+                                Intent intent = new Intent(CreateAccountActivity.this, Main2Activity.class);
+                                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                startActivity(intent);
+                            } else {
+                                Toast.makeText(CreateAccountActivity.this, "fail to create account. Your phone number or email may be registered", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+                            Log.d(TAG, e.getMessage());
+                        }
+
+                    });
+        } else {
+            apiInterface.driverCreateAccount(file, username, password, phonenumber, email)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new SingleObserver<AccountResponse>() {
+                        @Override
+                        public void onSubscribe(Disposable d) {
+                            Log.d(TAG, "onSubscribe: ");
+                        }
+
+                        @Override
+                        public void onSuccess(AccountResponse response) {
+                            if(response.success == 1) {
+                                Toast.makeText(CreateAccountActivity.this, "Account created successfully", Toast.LENGTH_SHORT).show();
+                                Session.logIn(CreateAccountActivity.this, usernameText.getText().toString(), response.access_token);
+                                //store the access code, account username, password, phone number
+                                //go to the main map activity
+                                Intent intent = new Intent(CreateAccountActivity.this, Main2Activity.class);
+                                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                startActivity(intent);
+                            } else {
+                                Toast.makeText(CreateAccountActivity.this, "fail to create account. Your phone number or email may be registered", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+                            Log.d(TAG, e.getMessage());
+                        }
+
+                    });
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        //reset the counter
+        if(flag) {
+            flag = false;
+            counterText.setVisibility(View.GONE);
+            verificationText.setVisibility(View.GONE);
+            registerButton.setVisibility(View.GONE);
+        }
     }
 
     //counting started (reminder user to input code)
@@ -131,49 +337,6 @@ public class CreateAccountActivity extends AppCompatActivity {
             }
         };
         countingThread.start();
-    }
-
-
-    View.OnClickListener registerAccount = new View.OnClickListener() {
-        @Override
-        public void onClick(View view) {
-            Map<String, String> params = new HashMap<>();
-            params.put("username", usernameText.getText().toString());
-            params.put("password", passwordText.getText().toString());
-            params.put("phonenumber", phoneText.getText().toString());
-            params.put("code", verificationText.getText().toString());
-            CustomRequest registerRequest = new CustomRequest(Request.Method.POST, Constants.create_account_api, params, new Response.Listener<JSONObject>() {
-                @Override
-                public void onResponse(JSONObject response) {
-                    try {
-                        if(response.getInt("success") == 1) {
-                            Toast.makeText(CreateAccountActivity.this, "Create Account successfully", Toast.LENGTH_LONG).show();
-                            //jump to the main activity
-                            Intent intent = new Intent(CreateAccountActivity.this, MainActivity.class);
-                            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                            startActivity(intent);
-                        } else {
-                            Toast.makeText(CreateAccountActivity.this, response.getString("message"), Toast.LENGTH_LONG).show();
-                        }
-                    } catch(JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }, ErrorMessageUtility.getNetworkErrorListener(CreateAccountActivity.this));
-            AppController.getInstance().addToRequestQueue(registerRequest, "registerRequest");
-        }
-    };
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        //reset the counter
-        if(flag) {
-            flag = false;
-            counterText.setVisibility(View.GONE);
-            verificationText.setVisibility(View.GONE);
-            registerButton.setVisibility(View.GONE);
-        }
     }
 
     static class CountingHandler extends Handler {

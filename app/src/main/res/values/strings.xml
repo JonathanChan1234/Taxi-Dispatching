@@ -31,5 +31,12 @@
     <string name="passengers_in_register">Passengers</string>
     <string name="driver_in_register">Driver</string>
     <string name="phone_prefix">+852</string>
+    <string name="register_for_a_new_taxi">Register For a New Taxi</string>
+    <string name="scan_qr_code_to_sign_in">Scan QR code to sign in</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="delete_taxi_account">Delete taxi account (You can only delete the taxi that you owned)</string>
+    <string name="reminder_text">This QR Code will saved at the \'taxi\' folder in your external storage</string>
 
 </resources>

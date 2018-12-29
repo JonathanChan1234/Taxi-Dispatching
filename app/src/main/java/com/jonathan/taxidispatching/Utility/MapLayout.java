@@ -73,7 +73,7 @@ public class MapLayout extends RelativeLayout {
         requestButton.setLayoutParams(requestButtonParams);
         requestButton.setBackgroundResource(R.drawable.round_button);
         requestButton.setTextSize(20);
-        requestButton.setText("Make Taxi Call");
+        requestButton.setText("Make Taxis Call");
         requestButton.setGravity(Gravity.CENTER);
         requestButton.setPadding(dp2px(20), dp2px(5), dp2px(20), dp2px(5));
         addressLayout.addView(requestButton);
@@ -86,7 +86,7 @@ public class MapLayout extends RelativeLayout {
         directionRequestButton.setLayoutParams(directionRequestButtonParams);
         directionRequestButton.setBackgroundResource(R.drawable.round_button);
         directionRequestButton.setTextSize(20);
-        directionRequestButton.setText("Make Taxi Call (Direction)");
+        directionRequestButton.setText("Make Taxis Call (Direction)");
         directionRequestButton.setGravity(Gravity.CENTER);
         directionRequestButton.setPadding(dp2px(20), dp2px(5), dp2px(20), dp2px(5));
         addressLayout.addView(directionRequestButton);

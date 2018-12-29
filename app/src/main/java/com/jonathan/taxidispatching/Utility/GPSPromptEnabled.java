@@ -14,7 +14,7 @@ import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
-import static com.jonathan.taxidispatching.activity.Main2Activity.REQUEST_CHECK_SETTINGS;
+import static com.jonathan.taxidispatching.constants.Constants.REQUEST_CHECK_SETTINGS;
 
 public class GPSPromptEnabled {
     /**

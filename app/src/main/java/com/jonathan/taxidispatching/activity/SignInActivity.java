@@ -12,8 +12,10 @@ import android.widget.Toast;
 
 import com.jonathan.taxidispatching.APIClient.APIClient;
 import com.jonathan.taxidispatching.APIInterface.APIInterface;
-import com.jonathan.taxidispatching.APIObject.AccountResponse;
+import com.jonathan.taxidispatching.Model.AccountResponse;
 import com.jonathan.taxidispatching.R;
+import com.jonathan.taxidispatching.SharePreference.Session;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -70,8 +72,12 @@ public class SignInActivity extends AppCompatActivity {
                         @Override
                         public void onSuccess(AccountResponse accountResponse) {
                             if (accountResponse.success == 1) {
+                                Session.logIn(SignInActivity.this,
+                                        phoneText.getText().toString(),
+                                        "passenger",
+                                        accountResponse.access_token);
                                 Toast.makeText(SignInActivity.this, "Successfully Log in", Toast.LENGTH_LONG).show();
-                                Intent intent = new Intent(SignInActivity.this, MainActivity.class);
+                                Intent intent = new Intent(SignInActivity.this, Main2Activity.class);
                                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                                 startActivity(intent);
                             } else {
@@ -96,8 +102,12 @@ public class SignInActivity extends AppCompatActivity {
                         @Override
                         public void onSuccess(AccountResponse accountResponse) {
                             if (accountResponse.success == 1) {
+                                Session.logIn(SignInActivity.this,
+                                        phoneText.getText().toString(),
+                                        "driver",
+                                        accountResponse.access_token);
                                 Toast.makeText(SignInActivity.this, "Successfully Log in", Toast.LENGTH_LONG).show();
-                                Intent intent = new Intent(SignInActivity.this, MainActivity.class);
+                                Intent intent = new Intent(SignInActivity.this, DriverMainActivity.class);
                                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                                 startActivity(intent);
                             } else {

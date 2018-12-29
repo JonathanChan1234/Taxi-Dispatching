@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="300dp"
+    android:layout_height="300dp"
+    android:background="@drawable/curve_shape"
+    android:orientation="vertical">
+    <TextView
+        android:id="@+id/titleText"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:textColor="@color/black"
+        android:background="@color/backgroundBlue"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textAllCaps="true"
+        android:text="Registration"/>
+
+    <EditText
+        android:id="@+id/plateNumberText"
+        android:layout_width="300dp"
+        android:layout_height="60dp"
+        android:layout_gravity="center"
+        android:layout_marginTop="20sp"
+        android:background="@drawable/round_input"
+        android:gravity="center"
+        android:hint="AA1234"
+        android:inputType="text"
+        android:textColor="@color/black"
+        android:textSize="20sp" />
+
+    <Button
+        android:id="@+id/plateRegistrationButton"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="40sp"
+        android:background="#DDDDDD"
+        android:text="Confirm"
+        android:textColor="@color/black" />
+</LinearLayout>

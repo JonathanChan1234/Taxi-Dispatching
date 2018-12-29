@@ -1,20 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/drivermain"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".ui.drivermain.DriverMainFragment">
+    xmlns:tools="http://schemas.android.com/tools">
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/mainFragementContainer">
+        <android.support.constraint.ConstraintLayout
+            android:id="@+id/drivermain"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#99ff99"
+            tools:context=".activity.ui.driver_main.DriverMainFragment">
 
-    <TextView
-        android:id="@+id/message"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="DriverMainFragment"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+                <Button
+                    android:layout_width="match_parent"
+                    android:layout_height="100dp"
+                    android:text="@string/register_for_a_new_taxi"
+                    android:textAllCaps="true"
+                    android:background="#ffcccc"
+                    android:id="@+id/registerPlateButton"/>
+                <Button
+                    android:layout_width="match_parent"
+                    android:layout_height="100dp"
+                    android:layout_marginTop="10dp"
+                    android:textAllCaps="true"
+                    android:text="@string/scan_qr_code_to_sign_in"
+                    android:background="#b3d9ff"
+                    android:id="@+id/signInPlateButton"/>
+                <Button
+                    android:layout_width="match_parent"
+                    android:layout_height="100dp"
+                    android:layout_marginTop="10dp"
+                    android:textAllCaps="true"
+                    android:text="@string/delete_taxi_account"
+                    android:id="@+id/deleteTaxiAccountButton"/>
+                <Button
+                    android:layout_width="match_parent"
+                    android:layout_height="100dp"
+                    android:id="@+id/switchFragmentButton"
+                    android:text="To Waiting Fragment"/>
+            </LinearLayout>
 
-</android.support.constraint.ConstraintLayout>
+        </android.support.constraint.ConstraintLayout>
+    </FrameLayout>
+</layout>
+

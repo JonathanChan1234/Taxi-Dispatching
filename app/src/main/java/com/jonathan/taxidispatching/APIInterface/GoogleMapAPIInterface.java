@@ -1,6 +1,6 @@
 package com.jonathan.taxidispatching.APIInterface;
 
-import com.jonathan.taxidispatching.APIObject.PlaceResource;
+import com.jonathan.taxidispatching.Model.PlaceResource;
 
 import retrofit2.Call;
 import retrofit2.http.GET;

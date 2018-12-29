@@ -9,16 +9,19 @@ public class Session {
     public static final String LOGGED = "Logged";
     public static final String USERNAME = "username";
     public static final String ACCESS_CODE = "access_code";
+    public static final String IDENTITY = "Identity";
+    public static final String PHONE_NUMBER = "phone number";
 
-    static SharedPreferences getPreferences(Context context) {
+    private static SharedPreferences getPreferences(Context context) {
         return PreferenceManager.getDefaultSharedPreferences(context);
     }
 
-    public static void logIn(Context context, String username, String accessCode) {
+    public static void logIn(Context context, String phonenumber, String identity, String accessCode) {
         SharedPreferences.Editor editor = getPreferences(context).edit();
         editor.putBoolean(LOGGED, true);
-        editor.putString(USERNAME, username);
+        editor.putString(PHONE_NUMBER, phonenumber);
         editor.putString(ACCESS_CODE, accessCode);
+        editor.putString(IDENTITY, identity);
         editor.apply();
     }
 

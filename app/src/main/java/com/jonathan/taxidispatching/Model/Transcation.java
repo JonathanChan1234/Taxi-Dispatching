@@ -1,4 +1,4 @@
-package com.jonathan.taxidispatching.APIObject;
+package com.jonathan.taxidispatching.Model;
 
 import android.support.annotation.Nullable;
 

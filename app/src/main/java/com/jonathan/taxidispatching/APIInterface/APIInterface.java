@@ -2,10 +2,11 @@ package com.jonathan.taxidispatching.APIInterface;
 
 import android.support.annotation.Nullable;
 
-import com.jonathan.taxidispatching.APIObject.AccountResponse;
-import com.jonathan.taxidispatching.APIObject.Transcation;
+import com.jonathan.taxidispatching.Model.AccountResponse;
+import com.jonathan.taxidispatching.Model.StandardResponse;
+import com.jonathan.taxidispatching.Model.Taxis;
+import com.jonathan.taxidispatching.Model.Transcation;
 
-import io.reactivex.Observable;
 import io.reactivex.Single;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
@@ -29,6 +30,7 @@ public interface APIInterface {
                                        @Field("meet_up_time")@Nullable String meet_up_time,
                                        @Field("requirement") @Nullable String requirement);
 
+    @FormUrlEncoded
     @POST("user/login")
     Single<AccountResponse> passengerSignIn(
             @Field("phonenumber") String phonenumber,
@@ -45,6 +47,7 @@ public interface APIInterface {
             @Part("email") RequestBody email
     );
 
+    @FormUrlEncoded
     @POST("driver/login")
     Single<AccountResponse> driverSignIn(
             @Field("phonenumber") String phonenumber,
@@ -59,5 +62,40 @@ public interface APIInterface {
             @Part("password") RequestBody password,
             @Part("phonenumber") RequestBody phonenumber,
             @Part("email") RequestBody email
+    );
+
+    @FormUrlEncoded
+    @POST("taxi/checkDuplicate")
+    Call<StandardResponse> checkDuplicate(
+            @Field("platenumber") String platenumber
+    );
+
+    @FormUrlEncoded
+    @POST("taxi/register")
+    Call<StandardResponse> registerNewTaxi(
+            @Field("platenumber") String platenumber,
+            @Field("password") String password,
+            @Field("id") Integer id
+    );
+
+    @FormUrlEncoded
+    @POST("taxi/signIn")
+    Call<StandardResponse> signInTaxi(
+            @Field("platenumber") String platenumber,
+            @Field("password") String password,
+            @Field("id") Integer id
+    );
+
+    @FormUrlEncoded
+    @POST("taxi/checkOwnerTaxi")
+    Call<Taxis> getTaxiList(
+            @Field("id") Integer id
+    );
+
+    @FormUrlEncoded
+    @POST("taxi/deleteAccount")
+    Call<StandardResponse> deleteTaxiAccount(
+            @Field("password") String password,
+            @Field("platenumber") String platenumber
     );
 }

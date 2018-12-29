@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activity.WaitingFragment">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/backgroundBlue">
+
+        <Button
+            android:id="@+id/startSearchingPassengerButton"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:layout_marginTop="50dp"
+            android:layout_centerHorizontal="true"
+            android:background="@drawable/circle_button"
+            android:text="Click to search passengers nearby"
+            android:textSize="20sp"
+            android:textColor="@color/white"/>
+
+        <ProgressBar
+            android:id="@+id/waitingProgressBar"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_below="@+id/startSearchingPassengerButton"
+            android:layout_centerHorizontal="true"/>
+
+        <Button
+            android:id="@+id/cancelSearchButton"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_below="@+id/waitingProgressBar"
+            android:layout_alignParentEnd="true"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="0dp"
+            android:background="@drawable/circle_button"
+            android:text="Cancel" />
+    </RelativeLayout>
+
+</android.support.constraint.ConstraintLayout>

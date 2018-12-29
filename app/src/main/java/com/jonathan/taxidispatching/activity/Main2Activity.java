@@ -15,7 +15,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -27,7 +26,6 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
 
 import com.android.volley.Response;
 import com.google.android.gms.common.ConnectionResult;
@@ -53,8 +51,8 @@ import com.jonathan.taxidispatching.APIClient.APIClient;
 import com.jonathan.taxidispatching.APIClient.GoogleMapAPIClient;
 import com.jonathan.taxidispatching.APIInterface.APIInterface;
 import com.jonathan.taxidispatching.APIInterface.GoogleMapAPIInterface;
-import com.jonathan.taxidispatching.APIObject.PlaceResource;
-import com.jonathan.taxidispatching.APIObject.Transcation;
+import com.jonathan.taxidispatching.Model.PlaceResource;
+import com.jonathan.taxidispatching.Model.Transcation;
 import com.jonathan.taxidispatching.AppController.AppController;
 import com.jonathan.taxidispatching.AppController.CustomRequest;
 import com.jonathan.taxidispatching.R;
@@ -74,9 +72,7 @@ import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -86,16 +82,17 @@ import java.util.Map;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.Callback;
+
+import static com.jonathan.taxidispatching.constants.Constants.REQUEST_CHECK_SETTINGS;
 
 public class Main2Activity extends AppCompatActivity implements
         OnMapReadyCallback,
         ActivityCompat.OnRequestPermissionsResultCallback,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
-    public static final int REQUEST_CHECK_SETTINGS = 100;
+
     //UI Components
     GoogleMap mMap;
     PlaceAutocompleteFragment fromSearchFragment, toSearchFragment; //Search Fragment
@@ -224,9 +221,11 @@ public class Main2Activity extends AppCompatActivity implements
             }
         });
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setHomeAsUpIndicator(R.drawable.ic_menu_black_24dp);
-        setSupportActionBar(toolbar);
+        if(actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setHomeAsUpIndicator(R.drawable.ic_menu_black_24dp);
+            setSupportActionBar(toolbar);
+        }
     }
 
     public boolean onOptionsItemSelected(MenuItem menuItem) {

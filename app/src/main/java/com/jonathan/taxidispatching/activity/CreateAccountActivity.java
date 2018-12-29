@@ -2,6 +2,7 @@ package com.jonathan.taxidispatching.activity;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -27,7 +28,7 @@ import android.widget.Toast;
 
 import com.jonathan.taxidispatching.APIClient.APIClient;
 import com.jonathan.taxidispatching.APIInterface.APIInterface;
-import com.jonathan.taxidispatching.APIObject.AccountResponse;
+import com.jonathan.taxidispatching.Model.AccountResponse;
 import com.jonathan.taxidispatching.R;
 import com.jonathan.taxidispatching.SharePreference.Session;
 import com.jonathan.taxidispatching.Utility.FileUtils;
@@ -79,8 +80,6 @@ public class CreateAccountActivity extends AppCompatActivity {
     //API Interface
     APIInterface apiInterface;
 
-    //Method chosen by the user on choosing the profile img
-    String userChosenTask = "";
     Bitmap thumbnail; //bitmap thumbnail posted on the page
     String imageFilePath; //imageFile Path to upload to the server
 
@@ -108,11 +107,9 @@ public class CreateAccountActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 if(items[i].equals("Take Photo")) {
-                    userChosenTask = "Take Photo";
                     CreateAccountActivityPermissionsDispatcher.cameraIntentWithPermissionCheck(CreateAccountActivity.this);
                 }
                 else if(items[i].equals("Choose from Library")) {
-                    userChosenTask = "Choose from Library";
                     CreateAccountActivityPermissionsDispatcher.galleryIntentWithPermissionCheck(CreateAccountActivity.this);
                 }
                 else if(items[i].equals("Cancel")){
@@ -223,13 +220,14 @@ public class CreateAccountActivity extends AppCompatActivity {
         MultipartBody.Part imageFile = null;
         if(imageFilePath != null) {
             File img = new File(imageFilePath);
-            RequestBody requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), img);
+            RequestBody requestFile = RequestBody.create(MediaType.parse("image/png"), img);
             imageFile = MultipartBody.Part.createFormData("profileImg", img.getName(), requestFile);
         }
-        RequestBody username = RequestBody.create(MediaType.parse("multipart/form-data"), usernameText.getText().toString());
-        RequestBody password = RequestBody.create(MediaType.parse("multipart/form-data"), passwordText.getText().toString());
-        RequestBody phonenumber = RequestBody.create(MediaType.parse("multipart/form-data"), phoneText.getText().toString());
-        RequestBody email = RequestBody.create(MediaType.parse("multipart/form-data"), emailText.getText().toString());
+        RequestBody username = RequestBody.create(MediaType.parse("text/plain"), usernameText.getText().toString());
+        RequestBody password = RequestBody.create(MediaType.parse("text/plain"), passwordText.getText().toString());
+        RequestBody phonenumber = RequestBody.create(MediaType.parse("text/plain"), phoneText.getText().toString());
+        RequestBody email = RequestBody.create(MediaType.parse("text/plain"), emailText.getText().toString());
+
         if(passengerButton.isChecked()) {
             makeRequest("passenger", imageFile, username, password, phonenumber, email);
         } else {
@@ -238,7 +236,10 @@ public class CreateAccountActivity extends AppCompatActivity {
     }
 
     private void makeRequest(String identity, MultipartBody.Part file, RequestBody username, RequestBody password, RequestBody phonenumber, RequestBody email) {
-        if(identity.equals("identity")) {
+        final ProgressDialog dialog = new ProgressDialog(this);
+        dialog.setTitle("Processing");
+        dialog.show();
+        if(identity.equals("passenger")) {
             apiInterface.passengerCreateAccount(file, username, password, phonenumber, email)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
@@ -250,9 +251,10 @@ public class CreateAccountActivity extends AppCompatActivity {
 
                         @Override
                         public void onSuccess(AccountResponse response) {
+                            dialog.hide();
                             if(response.success == 1) {
                                 Toast.makeText(CreateAccountActivity.this, "Account created successfully", Toast.LENGTH_SHORT).show();
-                                Session.logIn(CreateAccountActivity.this, usernameText.getText().toString(), response.access_token);
+                                Session.logIn(CreateAccountActivity.this,"passenger", phoneText.getText().toString(), response.access_token);
                                 //store the access code, account username, password, phone number
                                 //go to the main map activity
                                 Intent intent = new Intent(CreateAccountActivity.this, Main2Activity.class);
@@ -265,6 +267,7 @@ public class CreateAccountActivity extends AppCompatActivity {
 
                         @Override
                         public void onError(Throwable e) {
+                            dialog.hide();
                             Log.d(TAG, e.getMessage());
                         }
 
@@ -282,11 +285,12 @@ public class CreateAccountActivity extends AppCompatActivity {
                         @Override
                         public void onSuccess(AccountResponse response) {
                             if(response.success == 1) {
+                                dialog.hide();
                                 Toast.makeText(CreateAccountActivity.this, "Account created successfully", Toast.LENGTH_SHORT).show();
-                                Session.logIn(CreateAccountActivity.this, usernameText.getText().toString(), response.access_token);
+                                Session.logIn(CreateAccountActivity.this, "driver", phoneText.getText().toString(), response.access_token);
                                 //store the access code, account username, password, phone number
                                 //go to the main map activity
-                                Intent intent = new Intent(CreateAccountActivity.this, Main2Activity.class);
+                                Intent intent = new Intent(CreateAccountActivity.this, DriverMainActivity.class);
                                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                                 startActivity(intent);
                             } else {
@@ -297,8 +301,8 @@ public class CreateAccountActivity extends AppCompatActivity {
                         @Override
                         public void onError(Throwable e) {
                             Log.d(TAG, e.getMessage());
+                            dialog.hide();
                         }
-
                     });
         }
     }

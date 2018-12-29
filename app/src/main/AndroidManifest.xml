@@ -10,7 +10,7 @@
          Google Maps Android API v2, but you must specify either coarse or fine
          location permissions for the 'MyLocation' functionality. 
     -->
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
@@ -25,26 +25,38 @@
     <application
         android:name=".AppController.AppController"
         android:allowBackup="true"
+        android:hardwareAccelerated="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
+        android:screenOrientation="portrait"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity
-            android:name=".activity.LogInActivity"
-            android:label="FYP"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar">
 
-            <!-- android:name=".activity.LogInActivity"> -->
+        <!-- <activity -->
+        <!-- android:name=".activity.LogInActivity" -->
+        <!-- android:label="FYP" -->
+        <!-- android:theme="@style/Theme.AppCompat.Light.NoActionBar"> -->
+
+
+        <!-- &lt;!&ndash; android:name=".activity.LogInActivity"> &ndash;&gt; -->
+        <!-- <intent-filter> -->
+        <!-- <action android:name="android.intent.action.MAIN" /> -->
+
+
+        <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
+        <!-- </intent-filter> -->
+        <!-- </activity> -->
+        <activity
+            android:name=".activity.DriverMainActivity"
+            android:label="Driver">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".activity.Main2Activity"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+        <activity android:name=".activity.Main2Activity" />
         <activity
             android:name=".activity.SignInActivity"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
@@ -67,7 +79,11 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyBwJyQDS_1ZZfic_OLFdB0q7UZC11B9vw4" />
 
-        <activity android:name=".activity.DriverMainActivity"></activity>
+        <!-- <activity android:name=".activity.DriverMainActivity"></activity> -->
+        <service
+            android:name=".Service.DriverSocketService"
+            android:enabled="true"
+            android:exported="true"></service>
     </application>
 
 </manifest>

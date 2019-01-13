@@ -3,7 +3,9 @@ package com.jonathan.taxidispatching.Model;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class UpdatedAt {
+import java.io.Serializable;
+
+public class UpdatedAt implements Serializable {
     @SerializedName("date")
     @Expose
     public String date;

@@ -1,7 +1,6 @@
 package com.jonathan.taxidispatching.activity;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -9,11 +8,15 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
+import com.jonathan.taxidispatching.Event.PassengerFoundEvent;
 import com.jonathan.taxidispatching.R;
 import com.jonathan.taxidispatching.activity.ui.driver_main.DriverMainFragment;
 
-public class DriverMainActivity extends AppCompatActivity implements
-        DriverMainFragment.DataExchangeInterface {
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
+public class DriverMainActivity extends AppCompatActivity {
     static FragmentManager manager;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,6 +28,7 @@ public class DriverMainActivity extends AppCompatActivity implements
                     .replace(R.id.driverActivityContainer, DriverMainFragment.newInstance())
                     .commitNow();
         }
+        EventBus.getDefault().register(this);
     }
 
     @Override
@@ -44,11 +48,8 @@ public class DriverMainActivity extends AppCompatActivity implements
         transaction.commit();
     }
 
-    public void onFragmentInteraction(Uri uri) {
-
-    }
-
-    public void sendData(Bundle message) {
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEvent(PassengerFoundEvent event) {
 
     }
 }

@@ -63,9 +63,6 @@ public class DriverMainFragment extends Fragment {
     @BindView(R.id.switchFragmentButton)
     Button toWaitingFragmentButton;
 
-    //Interface for data exchange
-    DataExchangeInterface dataExchangeInterface;
-
     public static DriverMainFragment newInstance() {
         return new DriverMainFragment();
     }
@@ -145,25 +142,10 @@ public class DriverMainFragment extends Fragment {
                         progressDialog.hide();
                         secondDialog.dismiss();
                         if(message.equals("success")) {
-                            Dialog dialog = new Dialog(activity);
-                            dialog.setContentView(R.layout.qrcode_dialog);
-                            ImageView view = dialog.findViewById(R.id.qrCodeView);
-                            try {
-                                BarcodeEncoder encoder = new BarcodeEncoder();
-                                Bitmap bitmap = encoder.encodeBitmap(platenumber, BarcodeFormat.QR_CODE, 400, 400);
-                                view.setImageBitmap(bitmap);
-                                DriverMainFragmentPermissionsDispatcher.storeQRCodeImageWithPermissionCheck(DriverMainFragment.this, bitmap, platenumber);
-                            } catch(Exception e) {
-                                e.printStackTrace();
-                            }
-                            Button button = dialog.findViewById(R.id.taxiSignInButton);
-                            button.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View view) {
-                                    DriverMainActivity.toWaitingFragment();
-                                }
-                            });
-                            dialog.show();
+                            AlertDialog dialog = new AlertDialog.Builder(activity)
+                                    .setTitle("Taxi account Registration")
+                                    .setMessage("Please download the Taxi QR code App for sign In")
+                                    .show();
                         } else {
                             Toast.makeText(activity, message, Toast.LENGTH_SHORT).show();
                         }
@@ -222,22 +204,21 @@ public class DriverMainFragment extends Fragment {
     /**
      * Enter password for sign in confirmation
      */
-    private void showEnterPasswordDialog(final String platenumber) {
+    private void showEnterPasswordDialog(final String accessToken) {
         passwordDialog = new Dialog(activity);
         passwordDialog.setContentView(R.layout.plate_registration_dialog_layout);
         final EditText editText = passwordDialog.findViewById(R.id.plateNumberText);
-        editText.setInputType(InputType.TYPE_TEXT_VARIATION_PASSWORD | InputType.TYPE_CLASS_TEXT);
         TextView title = passwordDialog.findViewById(R.id.titleText);
-        title.setText("Enter the password");
+        title.setText("Enter the taxi account plate number");
         Button button = passwordDialog.findViewById(R.id.confirmationButton);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                dataModel.signInTaxi(platenumber, editText.getText().toString(), 5, new DriverMainDataModel.onDataReadyCallBack() {
+                dataModel.signInTaxi(editText.getText().toString(), accessToken, 5, new DriverMainDataModel.onDataReadyCallBack() {
                     @Override
                     public void onCallBack(String message) {
                         if(message.equals("success")) {
-
+                            DriverMainActivity.toWaitingFragment();
                         } else {
                             Toast.makeText(activity, message, Toast.LENGTH_SHORT).show();
                         }
@@ -306,25 +287,10 @@ public class DriverMainFragment extends Fragment {
                 Toast.makeText(getActivity(), "Cancelled", Toast.LENGTH_SHORT).show();
             } else {
                 Log.d("QR Code", "Scanned: " + result.getContents());
-                platenumber = result.getContents();
                 showEnterPasswordDialog(result.getContents());
             }
         } else {
             super.onActivityResult(requestCode, resultCode, data);
-        }
-    }
-
-    public interface DataExchangeInterface {
-        void sendData(Bundle data);
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        try {
-            dataExchangeInterface = (DataExchangeInterface) getActivity();
-        } catch(ClassCastException e) {
-            Log.d("Class exception", e.getMessage());
         }
     }
 }

@@ -11,4 +11,6 @@ public class AccountResponse {
     public String token_type;
     @SerializedName("expires_in")
     public Integer expires_in;
+    @SerializedName("user")
+    public User user;
 }

@@ -77,4 +77,9 @@ dependencies {
     //QR Code Scanner
     implementation 'com.journeyapps:zxing-android-embedded:3.6.0'
 
+    //Socket.IO client
+    implementation('io.socket:socket.io-client:1.0.0') {
+        exclude group: 'org.json', module: 'json'
+    }
+
 }

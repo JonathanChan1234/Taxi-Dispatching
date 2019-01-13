@@ -5,11 +5,13 @@ import android.support.annotation.Nullable;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class Transcation {
+import java.io.Serializable;
+
+public class Transcation implements Serializable {
     @SerializedName("data")
     @Expose
     public Data data;
-    public class Data {
+    public class Data implements Serializable {
         @SerializedName("id")
         @Expose
         public Integer id;

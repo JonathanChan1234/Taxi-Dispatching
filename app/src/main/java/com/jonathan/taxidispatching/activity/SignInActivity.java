@@ -77,7 +77,7 @@ public class SignInActivity extends AppCompatActivity {
                                         "passenger",
                                         accountResponse.access_token);
                                 Toast.makeText(SignInActivity.this, "Successfully Log in", Toast.LENGTH_LONG).show();
-                                Intent intent = new Intent(SignInActivity.this, Main2Activity.class);
+                                Intent intent = new Intent(SignInActivity.this, MadeTransactionActivity.class);
                                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                                 startActivity(intent);
                             } else {

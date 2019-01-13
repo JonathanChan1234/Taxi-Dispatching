@@ -32,31 +32,21 @@
         android:screenOrientation="portrait"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
-        <!-- <activity -->
-        <!-- android:name=".activity.LogInActivity" -->
-        <!-- android:label="FYP" -->
-        <!-- android:theme="@style/Theme.AppCompat.Light.NoActionBar"> -->
-
-
-        <!-- &lt;!&ndash; android:name=".activity.LogInActivity"> &ndash;&gt; -->
-        <!-- <intent-filter> -->
-        <!-- <action android:name="android.intent.action.MAIN" /> -->
-
-
-        <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
-        <!-- </intent-filter> -->
-        <!-- </activity> -->
         <activity
-            android:name=".activity.DriverMainActivity"
-            android:label="Driver">
+            android:name=".activity.MadeTransactionActivity"
+            android:label="Make your taxi call"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.VIEW" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.Main2Activity" />
+        <activity
+            android:name=".activity.DriverMainActivity"
+            android:label="Make your call"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
         <activity
             android:name=".activity.SignInActivity"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
@@ -64,8 +54,9 @@
             android:name=".activity.CreateAccountActivity"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
         <activity
-            android:name=".activity.MainActivity"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+            android:name=".activity.LogInActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"></activity>
+        <activity android:name=".activity.passenger_main_activity.TransactionActivity" />
 
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
@@ -83,7 +74,12 @@
         <service
             android:name=".Service.DriverSocketService"
             android:enabled="true"
-            android:exported="true"></service>
+            android:exported="true" />
+        <service
+            android:name=".Service.PassengerSocketService"
+            android:enabled="true"
+            android:exported="true" />
+
     </application>
 
 </manifest>

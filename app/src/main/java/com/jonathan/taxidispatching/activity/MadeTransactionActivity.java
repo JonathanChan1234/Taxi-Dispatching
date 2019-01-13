@@ -56,10 +56,13 @@ import com.jonathan.taxidispatching.Model.Transcation;
 import com.jonathan.taxidispatching.AppController.AppController;
 import com.jonathan.taxidispatching.AppController.CustomRequest;
 import com.jonathan.taxidispatching.R;
+import com.jonathan.taxidispatching.Service.PassengerSocketService;
+import com.jonathan.taxidispatching.SharePreference.Session;
 import com.jonathan.taxidispatching.Utility.ErrorMessageUtility;
 import com.jonathan.taxidispatching.Utility.GPSPromptEnabled;
 import com.jonathan.taxidispatching.Utility.PermissionUtils;
 import com.jonathan.taxidispatching.Utility.PlaceUtils;
+import com.jonathan.taxidispatching.activity.passenger_main_activity.TransactionActivity;
 import com.jonathan.taxidispatching.constants.Constants;
 import com.jonathan.taxidispatching.Utility.JSONDirectionParser;
 
@@ -87,7 +90,7 @@ import retrofit2.Callback;
 
 import static com.jonathan.taxidispatching.constants.Constants.REQUEST_CHECK_SETTINGS;
 
-public class Main2Activity extends AppCompatActivity implements
+public class MadeTransactionActivity extends AppCompatActivity implements
         OnMapReadyCallback,
         ActivityCompat.OnRequestPermissionsResultCallback,
         GoogleApiClient.ConnectionCallbacks,
@@ -104,10 +107,10 @@ public class Main2Activity extends AppCompatActivity implements
     TextView timePickerText;
     @BindView(R.id.clearButton)
     Button clearButton;
-
-    private DrawerLayout mDrawerLayout;
     @BindView(R.id.toolbar)
     Toolbar toolbar;
+
+    private DrawerLayout mDrawerLayout;
 
     //Constant
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
@@ -133,13 +136,11 @@ public class Main2Activity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ///hide the title bar and set the content view
-//        requestWindowFeature(Window.FEATURE_NO_TITLE);
-//        getSupportActionBar().hide();
         setContentView(R.layout.activity_main2);
         googleApiInterface = GoogleMapAPIClient.getClient().create(GoogleMapAPIInterface.class);
         apiInterface = APIClient.getClient().create(APIInterface.class);
 
-        //Initialize UI Button
+        //Initialize UI Binding
         ButterKnife.bind(this);
 
         initSearchFragment();
@@ -184,7 +185,7 @@ public class Main2Activity extends AppCompatActivity implements
             }
             @Override
             public void onError(Status status) {
-                Toast.makeText(Main2Activity.this, "Error occurred", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MadeTransactionActivity.this, "Error occurred", Toast.LENGTH_SHORT).show();
             }
         });
         toSearchFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
@@ -195,7 +196,7 @@ public class Main2Activity extends AppCompatActivity implements
             }
             @Override
             public void onError(Status status) {
-                Toast.makeText(Main2Activity.this, "Error occurred", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MadeTransactionActivity.this, "Error occurred", Toast.LENGTH_SHORT).show();
             }
         });
         //define search filter
@@ -220,12 +221,10 @@ public class Main2Activity extends AppCompatActivity implements
                 return true;
             }
         });
-        ActionBar actionBar = getSupportActionBar();
-        if(actionBar != null) {
-            actionBar.setDisplayHomeAsUpEnabled(true);
-            actionBar.setHomeAsUpIndicator(R.drawable.ic_menu_black_24dp);
-            setSupportActionBar(toolbar);
-        }
+        setSupportActionBar(toolbar);
+        ActionBar actionbar = getSupportActionBar();
+        actionbar.setDisplayHomeAsUpEnabled(true);
+        actionbar.setHomeAsUpIndicator(R.drawable.ic_menu);
     }
 
     public boolean onOptionsItemSelected(MenuItem menuItem) {
@@ -288,7 +287,7 @@ public class Main2Activity extends AppCompatActivity implements
             String url = String.format(direction_url, marker[0].latitude + "," + marker[0].longitude
                     , marker[1].latitude + "," + marker[1].longitude, Constants.google_map_api_key);
             Log.d("url", url);
-            final ProgressDialog getDistanceProgressDialog = new ProgressDialog(Main2Activity.this);
+            final ProgressDialog getDistanceProgressDialog = new ProgressDialog(MadeTransactionActivity.this);
             getDistanceProgressDialog.setTitle("Processing");
             getDistanceProgressDialog.show();
             CustomRequest routeRequest = new CustomRequest(url, null, new Response.Listener<JSONObject>() {
@@ -302,13 +301,13 @@ public class Main2Activity extends AppCompatActivity implements
                             //Pop up confirmation dialog
                             if (details != null) confirmationDialogPopUp(details);
                         } else {
-                            Toast.makeText(Main2Activity.this, "Route Not Found", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(MadeTransactionActivity.this, "Route Not Found", Toast.LENGTH_SHORT).show();
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
                 }
-            }, ErrorMessageUtility.getNetworkErrorListener(Main2Activity.this));
+            }, ErrorMessageUtility.getNetworkErrorListener(MadeTransactionActivity.this));
             AppController.getInstance().addToRequestQueue(routeRequest, "searchRoute");
         } else {
             Toast.makeText(this, "You have to select both the pick-up point \nand destination", Toast.LENGTH_SHORT).show();
@@ -321,7 +320,7 @@ public class Main2Activity extends AppCompatActivity implements
      * @param details contain the JSON Info
      */
     private void confirmationDialogPopUp(JSONObject details) {
-        final Dialog dialog = new Dialog(Main2Activity.this);
+        final Dialog dialog = new Dialog(MadeTransactionActivity.this);
         dialog.setContentView(R.layout.custom_bill_dialog);
         Button confirmationButton = dialog.findViewById(R.id.confirmationButton);
         TextView detailsText = dialog.findViewById(R.id.billDetailText);
@@ -340,22 +339,32 @@ public class Main2Activity extends AppCompatActivity implements
                 EditText requirementText = dialog.findViewById(R.id.requirementText);
                 String text = requirementText.getText().toString();
                 String meet_up_time = timePickerText.getText().toString();
-                Call<Transcation> call = apiInterface.startTranscation(1, marker[0].latitude, marker[0].longitude, address.get("origin"),
+                Call<Transcation> call = apiInterface.startTranscation(9, marker[0].latitude, marker[0].longitude, address.get("origin"),
                         marker[1].latitude, marker[1].longitude, address.get("destination"), meet_up_time, text);
+                loadingDialog.show();
                 call.enqueue(new Callback<Transcation>() {
                     @Override
                     public void onResponse(Call<Transcation> call, retrofit2.Response<Transcation> response) {
-                        if(response.code() == 200) {
-                            Toast.makeText(Main2Activity.this, "Transaction made successfully", Toast.LENGTH_SHORT).show();
-                            //Do something
+                        // Check the HTTP request code (lower than 400 will be OK)
+                        loadingDialog.hide();
+                        if(response.code() < 400 && response.body() != null) {
+                            //Store the current transcation id
+                            Session.saveCurrentTransaction(MadeTransactionActivity.this, response.body().data.id, response.body().data);
+                            //Toast message
+                            Toast.makeText(MadeTransactionActivity.this, "Transaction will be processed", Toast.LENGTH_SHORT).show();
+                            //Go to transaction activity
+                            Intent activityIntent = new Intent(MadeTransactionActivity.this, TransactionActivity.class);
+                            activityIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK); //Clear task top
+                            startActivity(activityIntent);
                         } else {
-                            Toast.makeText(Main2Activity.this, "Something is wrong. Please try again", Toast.LENGTH_SHORT).show();
+                            dialog.dismiss();
+                            Toast.makeText(MadeTransactionActivity.this, "Something is wrong. Please try again", Toast.LENGTH_SHORT).show();
                         }
                     }
 
                     @Override
                     public void onFailure(Call<Transcation> call, Throwable t) {
-                        Toast.makeText(Main2Activity.this, "Network connction issue", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MadeTransactionActivity.this, "Network connction issue", Toast.LENGTH_SHORT).show();
                     }
                 });
                 dialog.dismiss();
@@ -372,7 +381,7 @@ public class Main2Activity extends AppCompatActivity implements
         @Override
         public void onMapClick(LatLng latLng) {
             tempMarker = latLng;
-            AlertDialog dialog = new AlertDialog.Builder(Main2Activity.this)
+            AlertDialog dialog = new AlertDialog.Builder(MadeTransactionActivity.this)
                     .setPositiveButton("Origin", setOrigin)
                     .setNeutralButton("Destination", setDestination)
                     .setTitle("Set as ...")
@@ -486,7 +495,7 @@ public class Main2Activity extends AppCompatActivity implements
             }
             @Override
             public void onFailure(Call<PlaceResource> call, Throwable t) {
-                Toast.makeText(Main2Activity.this, "Network connection issue", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MadeTransactionActivity.this, "Network connection issue", Toast.LENGTH_SHORT).show();
             }
         });
     }

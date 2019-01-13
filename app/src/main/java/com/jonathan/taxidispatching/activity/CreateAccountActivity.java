@@ -257,7 +257,7 @@ public class CreateAccountActivity extends AppCompatActivity {
                                 Session.logIn(CreateAccountActivity.this,"passenger", phoneText.getText().toString(), response.access_token);
                                 //store the access code, account username, password, phone number
                                 //go to the main map activity
-                                Intent intent = new Intent(CreateAccountActivity.this, Main2Activity.class);
+                                Intent intent = new Intent(CreateAccountActivity.this, MadeTransactionActivity.class);
                                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                                 startActivity(intent);
                             } else {
@@ -301,6 +301,7 @@ public class CreateAccountActivity extends AppCompatActivity {
                         @Override
                         public void onError(Throwable e) {
                             Log.d(TAG, e.getMessage());
+                            Toast.makeText(CreateAccountActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
                             dialog.hide();
                         }
                     });

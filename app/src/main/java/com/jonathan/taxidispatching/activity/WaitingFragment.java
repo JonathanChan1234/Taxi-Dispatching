@@ -12,15 +12,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.google.android.gms.location.LocationSettingsStates;
-import com.jonathan.taxidispatching.Event.PassengerFoundEvent;
 import com.jonathan.taxidispatching.R;
+import com.jonathan.taxidispatching.Service.DriverSocketService;
 import com.jonathan.taxidispatching.Utility.GPSPromptEnabled;
-
-import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -58,7 +55,6 @@ public class WaitingFragment extends Fragment {
         activity = getActivity();
         progressBar.setVisibility(View.INVISIBLE);
         cancelButton.setVisibility(View.INVISIBLE);
-        EventBus.getDefault().register(this);
     }
 
     @Override
@@ -101,6 +97,7 @@ public class WaitingFragment extends Fragment {
                     case Activity.RESULT_OK:
                         break;
                     case Activity.RESULT_CANCELED:
+                        Toast.makeText(activity, "You have to turn on the GPS in order to use the service", Toast.LENGTH_SHORT).show();
                         break;
                     default:
                         break;
@@ -109,12 +106,26 @@ public class WaitingFragment extends Fragment {
         }
     }
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void observeChange(PassengerFoundEvent event) {
-
+    public void startSearchingForPassenger() {
+        Intent intent = new Intent(activity, DriverSocketService.class);
+        activity.startService(intent);
+        enableCancel();
     }
 
-    public void startSearchingForPassenger() {
+    private void enableCancel() {
+        progressBar.setVisibility(View.VISIBLE);
+        cancelButton.setVisibility(View.VISIBLE);
+        searchButton.setEnabled(false);
+    }
 
+    @OnClick(R.id.cancelSearchButton)
+    public void cancelSearch() {
+        Intent intent = new Intent(activity, DriverSocketService.class);
+        activity.stopService(intent);
+
+        //Update the status of the driver by HTTP
+        progressBar.setVisibility(View.INVISIBLE);
+        cancelButton.setVisibility(View.INVISIBLE);
+        searchButton.setEnabled(true);
     }
 }

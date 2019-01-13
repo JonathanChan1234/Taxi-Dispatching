@@ -9,27 +9,25 @@
         android:id="@+id/content_frame"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-
         <LinearLayout
             xmlns:android="http://schemas.android.com/apk/res/android"
             xmlns:tools="http://schemas.android.com/tools"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="vertical"
-            tools:context=".activity.Main2Activity"
-            android:background="@color/backgroundBlue">
+            tools:context=".activity.MadeTransactionActivity">
             <android.support.v7.widget.Toolbar
-                android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
+                android:id="@+id/toolbar"
                 android:background="?attr/colorPrimary"
-                android:theme="@style/ThemeOverlay.AppCompat.ActionBar" />
+                android:theme="@style/ThemeOverlay.AppCompat.ActionBar"/>
             <fragment
                 android:id="@+id/searchFromText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:name="com.google.android.gms.location.places.ui.PlaceAutocompleteFragment"
-                tools:context=".activity.Main2Activity"
+                tools:context=".activity.MadeTransactionActivity"
                 android:layout_marginBottom="5dp"
                 android:clickable = "true"
                 android:src="@drawable/powered_by_google_light"/>
@@ -38,7 +36,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:name="com.google.android.gms.location.places.ui.PlaceAutocompleteFragment"
-                tools:context=".activity.Main2Activity"
+                tools:context=".activity.MadeTransactionActivity"
                 android:clickable = "true"
                 android:layout_marginBottom="5dp"
                 android:src="@drawable/powered_by_google_dark"/>
@@ -94,7 +92,7 @@
                 android:name="com.google.android.gms.maps.SupportMapFragment"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                tools:context=".activity.Main2Activity"/>
+                tools:context=".activity.MadeTransactionActivity"/>
         </LinearLayout>
     </FrameLayout>
     <android.support.design.widget.NavigationView

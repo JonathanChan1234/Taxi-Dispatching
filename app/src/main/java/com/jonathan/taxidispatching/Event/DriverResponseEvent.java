@@ -3,13 +3,15 @@ package com.jonathan.taxidispatching.Event;
 import com.jonathan.taxidispatching.Model.Driver;
 import com.jonathan.taxidispatching.Model.Transcation;
 
-public class PassengerFoundEvent {
+public class DriverResponseEvent {
     private Transcation.Data transcation;
     private Driver driver;
+    private int response;
 
-    public PassengerFoundEvent(Transcation.Data transcation, Driver driver) {
+    public DriverResponseEvent(Transcation.Data transcation, Driver driver, int response) {
         this.driver = driver;
         this.transcation = transcation;
+        this.response = response;
     }
 
     public Driver getDriver() {
@@ -18,5 +20,9 @@ public class PassengerFoundEvent {
 
     public Transcation.Data getTranscation() {
         return transcation;
+    }
+
+    public int getResponse() {
+        return response;
     }
 }

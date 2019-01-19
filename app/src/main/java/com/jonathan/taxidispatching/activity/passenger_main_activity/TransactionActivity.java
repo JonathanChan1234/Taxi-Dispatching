@@ -12,6 +12,7 @@ import android.widget.Toast;
 import com.jonathan.taxidispatching.APIClient.APIClient;
 import com.jonathan.taxidispatching.APIInterface.APIInterface;
 import com.jonathan.taxidispatching.Event.DriverFoundEvent;
+import com.jonathan.taxidispatching.Event.StopServiceEvent;
 import com.jonathan.taxidispatching.Event.TimerEvent;
 import com.jonathan.taxidispatching.Model.Transcation;
 import com.jonathan.taxidispatching.R;
@@ -66,11 +67,11 @@ public class TransactionActivity extends AppCompatActivity {
                     switch (response.body().data.status) {
                         case 100:
                             //passenger waiting for available driver
-                            changeFragment(Passenger_Waiting_Fragment.newInstance(response.body()), true);
+                            changeFragment(Passenger_Waiting_Fragment.newInstance(response.body().data), true);
                             break;
                         case 101:
                             //waiting for driver to order and passenger has to accept the order
-                            changeFragment(Passenger_Waiting_Fragment.newInstance(response.body()), true);
+                            changeFragment(Passenger_Waiting_Fragment.newInstance(response.body().data), true);
                             break;
                         case 102:
                             break;
@@ -149,8 +150,7 @@ public class TransactionActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Intent serviceIntent = new Intent(TransactionActivity.this, PassengerSocketService.class);
-        stopService(serviceIntent);
+        EventBus.getDefault().post(new StopServiceEvent());
     }
 
     @Override

@@ -45,6 +45,7 @@
                     android:layout_height="100dp"
                     android:id="@+id/switchFragmentButton"
                     android:text="To Waiting Fragment"/>
+
             </LinearLayout>
 
         </android.support.constraint.ConstraintLayout>

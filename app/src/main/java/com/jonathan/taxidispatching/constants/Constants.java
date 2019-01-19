@@ -20,4 +20,6 @@ public class Constants {
     public static final int LOGGED_IN_START_TRANSACTION_PASSENGER = 301;
     public static final int TRANSACTION_ONGOING_PASSENGER = 400;
     public static final int TRANSACTION_ONGOING_DRIVER = 401;
+    public static final String TRANSCATION_INVITATION = "transcationInvitation";
+    public static final String LOCATION_UPDATE = "locationUpdate";
 }

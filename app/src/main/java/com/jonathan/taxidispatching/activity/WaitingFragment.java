@@ -2,6 +2,7 @@ package com.jonathan.taxidispatching.activity;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -18,6 +19,7 @@ import com.google.android.gms.location.LocationSettingsStates;
 import com.jonathan.taxidispatching.R;
 import com.jonathan.taxidispatching.Service.DriverSocketService;
 import com.jonathan.taxidispatching.Utility.GPSPromptEnabled;
+import com.jonathan.taxidispatching.activity.ui.driver_main.DriverMainDataModel;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -35,6 +37,8 @@ public class WaitingFragment extends Fragment {
     Button cancelButton;
 
     Activity activity;
+    DriverMainDataModel dataModel;
+    ProgressDialog progressDialog;
 
     public static WaitingFragment newInstance() {
         return new WaitingFragment();
@@ -53,8 +57,11 @@ public class WaitingFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         activity = getActivity();
+        progressDialog = new ProgressDialog(activity);
+        progressDialog.setTitle("Processing");
         progressBar.setVisibility(View.INVISIBLE);
         cancelButton.setVisibility(View.INVISIBLE);
+        dataModel = new DriverMainDataModel();
     }
 
     @Override
@@ -107,9 +114,22 @@ public class WaitingFragment extends Fragment {
     }
 
     public void startSearchingForPassenger() {
-        Intent intent = new Intent(activity, DriverSocketService.class);
-        activity.startService(intent);
-        enableCancel();
+        progressDialog.show();
+        dataModel.setOccupied(4, 0, new DriverMainDataModel.onDataSucessCallBack() {
+            @Override
+            public void onCallBack(int success) {
+                if(success == 1) {
+                    searchButton.setText("On Serve");
+                    progressDialog.dismiss();
+                    Intent intent = new Intent(activity, DriverSocketService.class);
+                    activity.startService(intent);
+                    enableCancel();
+                } else {
+                    Toast.makeText(activity, "Something is wrong, please check your internet connection",
+                            Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 
     private void enableCancel() {
@@ -120,12 +140,24 @@ public class WaitingFragment extends Fragment {
 
     @OnClick(R.id.cancelSearchButton)
     public void cancelSearch() {
-        Intent intent = new Intent(activity, DriverSocketService.class);
-        activity.stopService(intent);
+        progressDialog.show();
+        dataModel.setOccupied(4, 1, new DriverMainDataModel.onDataSucessCallBack() {
+            @Override
+            public void onCallBack(int success) {
+                if(success == 1) {
+                    progressDialog.dismiss();
+                    Intent intent = new Intent(activity, DriverSocketService.class);
+                    activity.stopService(intent);
 
-        //Update the status of the driver by HTTP
-        progressBar.setVisibility(View.INVISIBLE);
-        cancelButton.setVisibility(View.INVISIBLE);
-        searchButton.setEnabled(true);
+                    //Update the status of the driver by HTTP
+                    progressBar.setVisibility(View.INVISIBLE);
+                    cancelButton.setVisibility(View.INVISIBLE);
+                    searchButton.setEnabled(true);
+                } else {
+                    Toast.makeText(activity, "Something is wrong, please check your internet connection",
+                            Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 }

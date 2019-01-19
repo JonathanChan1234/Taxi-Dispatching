@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".PassengerFoundFragment">
+    tools:context=".activity.PassengerFoundFragment">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -138,26 +138,30 @@
                 </TableRow>
             </TableLayout>
 
-            <com.google.android.gms.maps.MapView
+            <fragment
+                xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
                 android:id="@+id/routeMap"
+                android:name="com.google.android.gms.maps.SupportMapFragment"
                 android:layout_width="match_parent"
-                android:layout_height="150dp"/>
+                android:layout_height="200dp"
+                tools:context=".activity.DriverMainActivity"/>
 
             <TextView
                 android:id="@+id/timeCounterText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:textAllCaps="true"
-                android:textSize="30sp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:text="Response within 1 mins"
                 android:textColor="@color/black"
                 android:textSize="15sp" />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/toDestinationButton"
+                android:text="To Destination"
+                android:background="@drawable/round_button"
+                android:layout_gravity="center"/>
         </LinearLayout>
 
 
@@ -170,7 +174,7 @@
             <TableRow>
 
                 <Button
-                    android:id="@+id/acceptDriverButton"
+                    android:id="@+id/acceptDealButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="10dp"
@@ -178,7 +182,7 @@
                     android:text="Accept" />
 
                 <Button
-                    android:id="@+id/rejectDriverButton"
+                    android:id="@+id/rejectDealButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="@drawable/round_button"

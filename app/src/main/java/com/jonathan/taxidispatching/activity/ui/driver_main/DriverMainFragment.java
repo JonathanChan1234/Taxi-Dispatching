@@ -25,6 +25,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
@@ -62,6 +67,8 @@ public class DriverMainFragment extends Fragment {
     Button deleteTaxiAccountButton;
     @BindView(R.id.switchFragmentButton)
     Button toWaitingFragmentButton;
+
+    GoogleMap map;
 
     public static DriverMainFragment newInstance() {
         return new DriverMainFragment();
@@ -287,7 +294,20 @@ public class DriverMainFragment extends Fragment {
                 Toast.makeText(getActivity(), "Cancelled", Toast.LENGTH_SHORT).show();
             } else {
                 Log.d("QR Code", "Scanned: " + result.getContents());
-                showEnterPasswordDialog(result.getContents());
+//                showEnterPasswordDialog(result.getContents());
+                String token = result.getContents();
+                dataModel.signInTaxi(token.substring(32, token.length()), token.substring(0, 32), 4, new DriverMainDataModel.onDataReadyCallBack() {
+                    @Override
+                    public void onCallBack(String message) {
+                        if(message.equals("success")) {
+                            if(message.equals("success")) {
+                                DriverMainActivity.toWaitingFragment();
+                            } else {
+                                Toast.makeText(activity, message, Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    }
+                });
             }
         } else {
             super.onActivityResult(requestCode, resultCode, data);

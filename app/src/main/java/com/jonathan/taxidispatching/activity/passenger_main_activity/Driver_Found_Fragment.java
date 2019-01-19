@@ -108,23 +108,24 @@ public class Driver_Found_Fragment extends Fragment {
         }
     }
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onTimerEvent(TimerEvent event) {
-        String text = "Please answer with " + String.format("%02d", event.getMinute()) +
-                ":" + String.format("%02d", event.getSecond());
-        timerText.setText(text);
-    }
-
     @OnClick(R.id.acceptDriverButton)
     public void acceptDriver() {
         // Fire the accept event to passenger socket service
         EventBus.getDefault().post(new DriverResponseEvent(transcation, driver, 1));
-        TransactionActivity.changeFragment(Passenger_driver_connect_fragment.newInstance(), true);
+        TransactionActivity.changeFragment(Passenger_driver_connect_fragment.newInstance(transcation, driver), true);
     }
 
     @OnClick(R.id.rejectDriverButton)
     public void rejectDriver() {
         // Fire the reject event to passenger socket service
         EventBus.getDefault().post(new DriverResponseEvent(transcation, driver, 0));
+        TransactionActivity.changeFragment(Passenger_Waiting_Fragment.newInstance(transcation), true);
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onTimerEvent(TimerEvent event) {
+        String text = "Please answer with " + String.format("%02d", event.getMinute()) +
+                ":" + String.format("%02d", event.getSecond());
+        timerText.setText(text);
     }
 }

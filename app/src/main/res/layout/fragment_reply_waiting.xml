@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activity.Waiting_reply_fragment">
+
+   <RelativeLayout
+       android:layout_width="match_parent"
+       android:layout_height="match_parent">
+       <ProgressBar
+           android:id="@+id/waitingProgressBar"
+           android:layout_width="100dp"
+           android:layout_height="100dp"
+           android:layout_centerInParent="true"/>
+       <TextView
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:layout_below="@+id/waitingProgressBar"
+           android:layout_centerHorizontal="true"
+           android:layout_marginTop="10dp"
+           android:textColor="@color/black"
+           android:textSize="18sp"
+           android:textStyle="bold"
+           android:text="Waiting for passenger's reply" />
+   </RelativeLayout>
+
+</FrameLayout>

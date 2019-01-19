@@ -70,6 +70,13 @@ public interface APIInterface {
     );
 
     @FormUrlEncoded
+    @POST("driver/setOccupied")
+    Call<StandardResponse> setOccupied(
+            @Field("id") Integer id,
+            @Field("occupied") Integer occupied
+    );
+
+    @FormUrlEncoded
     @POST("taxi/checkDuplicate")
     Call<StandardResponse> checkDuplicate(
             @Field("platenumber") String platenumber

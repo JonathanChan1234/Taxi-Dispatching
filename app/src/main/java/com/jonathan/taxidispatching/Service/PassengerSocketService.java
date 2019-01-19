@@ -15,8 +15,11 @@ import android.util.Log;
 import com.google.gson.Gson;
 import com.jonathan.taxidispatching.Event.DriverFoundEvent;
 import com.jonathan.taxidispatching.Event.DriverResponseEvent;
+import com.jonathan.taxidispatching.Event.LocationUpdateEvent;
+import com.jonathan.taxidispatching.Event.StopServiceEvent;
 import com.jonathan.taxidispatching.Event.TimerEvent;
 import com.jonathan.taxidispatching.Model.DriverFoundResponse;
+import com.jonathan.taxidispatching.Model.DriverLocation;
 import com.jonathan.taxidispatching.R;
 import com.jonathan.taxidispatching.SharePreference.Session;
 import com.jonathan.taxidispatching.Utility.DriverNotificationChannel;
@@ -98,6 +101,7 @@ public class PassengerSocketService extends Service {
         mSocket.on(Socket.EVENT_CONNECT_ERROR, onConnectError);
         mSocket.on(Socket.EVENT_CONNECT_TIMEOUT, onTimeout);
         mSocket.on(Constants.driver_found_event, driverFound);
+        mSocket.on(Constants.LOCATION_UPDATE, locationUpdateFromDriver);
     }
 
     private void disconnectSocket() {
@@ -106,6 +110,7 @@ public class PassengerSocketService extends Service {
         mSocket.off(Socket.EVENT_DISCONNECT, onDisconnect);
         mSocket.off(Socket.EVENT_CONNECT_ERROR, onConnectError);
         mSocket.off(Socket.EVENT_CONNECT_TIMEOUT, onTimeout);
+        mSocket.off(Constants.LOCATION_UPDATE, locationUpdateFromDriver);
     }
 
     private Emitter.Listener onConnect = new Emitter.Listener() {
@@ -128,6 +133,7 @@ public class PassengerSocketService extends Service {
                 initHttpSocket();
             }
             isConnected = true;
+            notifyUser("Connected to the server");
         }
     };
 
@@ -204,9 +210,18 @@ public class PassengerSocketService extends Service {
             });
             timerThread.start();
         }
-
-        Log.i("Driver Found Response", "timer started");
     }
+
+    private Emitter.Listener locationUpdateFromDriver = new Emitter.Listener() {
+        @Override
+        public void call(Object... args) {
+            JSONObject locationData = (JSONObject) args[0];
+            Log.i("Location data", locationData.toString());
+            Gson gson = new Gson();
+            DriverLocation location = gson.fromJson(locationData.toString(), DriverLocation.class);
+            EventBus.getDefault().post(new LocationUpdateEvent(location));
+        }
+    };
 
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
     public void onDriverResponseEvent(DriverResponseEvent event) {
@@ -275,6 +290,12 @@ public class PassengerSocketService extends Service {
         return null;
     }
 
+    @Subscribe(threadMode = ThreadMode.BACKGROUND)
+    public void onStopServiceEvent(StopServiceEvent event) {
+        stopForeground(true);
+        stopSelf();
+    }
+
     @Override
     public void onDestroy() {
         Log.i(TAG, "Service destroyed");
@@ -285,8 +306,6 @@ public class PassengerSocketService extends Service {
 
         EventBus.getDefault().unregister(this);
         disconnectSocket();
-        stopForeground(true);
-        stopSelf();
         super.onDestroy();
     }
 }

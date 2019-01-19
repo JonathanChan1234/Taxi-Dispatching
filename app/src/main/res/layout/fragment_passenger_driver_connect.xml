@@ -5,10 +5,61 @@
     android:layout_height="match_parent"
     tools:context=".activity.passenger_main_activity.Passenger_driver_connect_fragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="Chat fragment" />
+        android:layout_height="match_parent">
 
+        <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:id="@+id/driverMap"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
+            android:layout_width="match_parent"
+            android:layout_height="350dp"
+            tools:context=".activity.passenger_main_activity.TransactionActivity" />
+
+        <LinearLayout
+            android:id="@+id/buttonGroup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:orientation="vertical">
+            <Button
+                android:id="@+id/messageDriverButton"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/driverMap"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/round_button"
+                android:text="Message to your driver" />
+
+            <Button
+                android:id="@+id/callDriverButton"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/messageDriverButton"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/round_button"
+                android:text="Call your driver" />
+
+            <Button
+                android:id="@+id/startRideButton"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/callDriverButton"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/round_button"
+                android:text="Start Ride" />
+        </LinearLayout>
+
+
+        <Button
+            android:id="@+id/cancelRideButton"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_toRightOf="@+id/buttonGroup"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/round_button"
+            android:text="Cancel Ride" />
+    </RelativeLayout>
 </FrameLayout>

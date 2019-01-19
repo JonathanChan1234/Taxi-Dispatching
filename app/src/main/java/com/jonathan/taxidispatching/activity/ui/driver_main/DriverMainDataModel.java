@@ -135,6 +135,31 @@ public class DriverMainDataModel {
                 });
     }
 
+    public void setOccupied(int id, int occupied, final onDataSucessCallBack callBack) {
+        service.setOccupied(id, occupied)
+                .enqueue(new Callback<StandardResponse>() {
+                    @Override
+                    public void onResponse(Call<StandardResponse> call, Response<StandardResponse> response) {
+                        if(response.body() != null) {
+                            if(response.body().success == 1) {
+                                callBack.onCallBack(1);
+                            } else {
+                                callBack.onCallBack(0);
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<StandardResponse> call, Throwable t) {
+                        callBack.onCallBack(0);
+                    }
+                });
+    }
+
+    public interface onDataSucessCallBack {
+        public void onCallBack(int success);
+    }
+
     public interface onDataReadyCallBack {
         public void onCallBack(String message);
     }

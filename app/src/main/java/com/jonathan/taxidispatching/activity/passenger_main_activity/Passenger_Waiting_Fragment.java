@@ -19,7 +19,7 @@ import butterknife.OnClick;
 public class Passenger_Waiting_Fragment extends Fragment {
     private static final String TRANSACTION = "transaction";
 
-    private Transcation transcation;
+    private Transcation.Data transcation;
 
     @BindView(R.id.idText)
     TextView idText;
@@ -41,7 +41,7 @@ public class Passenger_Waiting_Fragment extends Fragment {
         // Required empty public constructor
     }
 
-    public static Passenger_Waiting_Fragment newInstance(Transcation transcation) {
+    public static Passenger_Waiting_Fragment newInstance(Transcation.Data transcation) {
         Passenger_Waiting_Fragment fragment = new Passenger_Waiting_Fragment();
         Bundle args = new Bundle();
         args.putSerializable(TRANSACTION, transcation);
@@ -53,7 +53,7 @@ public class Passenger_Waiting_Fragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            transcation = (Transcation) getArguments().getSerializable(TRANSACTION);
+            transcation = (Transcation.Data) getArguments().getSerializable(TRANSACTION);
         }
     }
 
@@ -70,11 +70,11 @@ public class Passenger_Waiting_Fragment extends Fragment {
     public void onResume() {
         super.onResume();
         if(transcation != null) {
-            idText.setText(String.valueOf(transcation.data.id));
-            pickUpPointText.setText(transcation.data.startAddr);
-            destinationText.setText(transcation.data.desAddr);
-            requirementText.setText(transcation.data.requirement);
-            statusText.setText(String.valueOf(transcation.data.status));
+            idText.setText(String.valueOf(transcation.id));
+            pickUpPointText.setText(transcation.startAddr);
+            destinationText.setText(transcation.desAddr);
+            requirementText.setText(transcation.requirement);
+            statusText.setText(String.valueOf(transcation.status));
         }
     }
 

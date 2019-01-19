@@ -28,7 +28,7 @@ public class DriverMainActivity extends AppCompatActivity {
                     .replace(R.id.driverActivityContainer, DriverMainFragment.newInstance())
                     .commitNow();
         }
-        EventBus.getDefault().register(this);
+
     }
 
     @Override
@@ -36,8 +36,24 @@ public class DriverMainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        EventBus.getDefault().unregister(this);
+    }
+
     public static void toWaitingFragment() {
         changeFragment(WaitingFragment.newInstance(), true);
+    }
+
+    public static void toReplyWaitingFragment() {
+        changeFragment(Waiting_reply_fragment.newInstance(), true);
     }
 
     private static void changeFragment(Fragment fragment, boolean init) {
@@ -49,7 +65,12 @@ public class DriverMainActivity extends AppCompatActivity {
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onEvent(PassengerFoundEvent event) {
+    public void onPassengerFoundEvent(PassengerFoundEvent event) {
+        changeFragment(PassengerFoundFragment.newInstance(event.getTranscation(), event.getDriver(), event.getData()), true);
+    }
 
+    @Override
+    public void onBackPressed() {
+        moveTaskToBack(true);
     }
 }
